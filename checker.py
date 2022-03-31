@@ -4,6 +4,7 @@ from requests import Response
 import requests
 import datetime
 import urllib.parse
+import os
 
 HEADERS = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,"
@@ -19,7 +20,7 @@ LIST_WORDS = ['SQL',
               'error']
 
 
-def get_file_lines(filename: str) -> list[str]:
+def get_file_lines(filename: str):
     try:
         with open(filename, encoding="utf-8") as f:
             symbols = f.read().split("\n")
@@ -31,7 +32,7 @@ def get_file_lines(filename: str) -> list[str]:
                          f"\033[31m\033[4m{filename}\033[0m exists\n")
 
 
-def check_site(site: str) -> list[str]:
+def check_site(site: str):
     tested_urls = []
     try:
         res = requests.get(url=site, headers=HEADERS).text
@@ -57,38 +58,40 @@ def error_in_body(response: Response) -> bool:
 
 
 def main():
-    url_0 = input('\n\033[33m\033[1m[ACTION]\033[0m INPUT URL FOR CHECK: ')
-    symbols = get_file_lines('payloads.txt')
-    tested_urls = check_site(url_0)
+    while True:
+        url_0 = input('\n\033[33m\033[1m[ACTION]\033[0m INPUT URL FOR CHECK: ')
+        symbols = get_file_lines('payloads.txt')
+        tested_urls = check_site(url_0)
 
-    if len(tested_urls) == 0:
-        print(f"\n\033[31m\033[1m[ERROR]\033[0m URL \033[31m\033[4m{url_0}\033[0m hasn`t <form> tag\n")
-        exit()
+        if len(tested_urls) == 0:
+            print(f"\n\033[31m\033[1m[ERROR]\033[0m URL \033[31m\033[4m{url_0}\033[0m hasn`t <form> tag\n")
+            exit()
 
-    cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-    for tested_url in tested_urls:
-        for symbol in symbols:
-            symbol = urllib.parse.quote_plus(symbol)
-            url = f'{tested_url}{symbol}'
-            res = requests.get(url)
-
-            print(
-                f"\033[33m\033[1m[{cur_time} - INFO]\033[0m: \033[34m\033[4m{url}\033[0m \033[33m\033[1mIS CHECKING....🤔\033[0m")
-
-            if error_in_body(res):
-                counter = 0
-                cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-                print(
-                    f"\033[32m\033[1m[{cur_time} - GOOD]\033[0m \033[33m\033[1mSQL-INJECTION IS POSSIBLE\033[0m "
-                    f"\033[34m\033[4m{url}\033[0m")
-                with open('inj_sites.txt', 'a+', encoding='utf-8') as file:
-                    file.write(f'{url}\n')
-                counter += 1
-    if counter == 0:
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-        print(
-            f"\033[31m\033[1m[{cur_time} - BAD]\033[0m \033[34m\033[4m{url_0}\033[0m "
-            f"\033[31m\033[1mNOT INJECTION\033[0m")
+        for tested_url in tested_urls:
+            for symbol in symbols:
+                symbol = urllib.parse.quote_plus(symbol)
+                url = f'{tested_url}{symbol}'
+                res = requests.get(url)
+
+                print(
+                    f"\033[33m\033[1m[{cur_time} - INFO]\033[0m: \033[34m\033[4m{url}\033[0m \033[33m\033[1mIS CHECKING....🤔\033[0m")
+
+                if error_in_body(res):
+                    counter = 0
+                    cur_time = datetime.datetime.now().strftime("%H:%M:%S")
+                    print(
+                        f"\033[32m\033[1m[{cur_time} - GOOD]\033[0m \033[33m\033[1mSQL-INJECTION IS POSSIBLE\033[0m "
+                        f"\033[34m\033[4m{url}\033[0m")
+                    with open('inj_sites.txt', 'a+', encoding='utf-8') as file:
+                        file.write(f'{url}\n')
+                    counter += 1
+
+        if not os.path.exists('inj_sites.txt'):
+            cur_time = datetime.datetime.now().strftime("%H:%M:%S")
+            print(
+                f"\033[31m\033[1m[{cur_time} - BAD]\033[0m \033[34m\033[4m{url_0}\033[0m "
+                f"\033[31m\033[1mNOT INJECTION\033[0m")
 
 
 if __name__ == "__main__":
