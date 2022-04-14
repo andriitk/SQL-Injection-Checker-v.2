@@ -28,8 +28,8 @@ def get_file_lines(filename: str):
             symbols = list(symbols)
             return symbols
     except FileNotFoundError:
-        raise SystemExit(f"\n\033[31m\033[1m[ERROR]\033[0m Please check if file "
-                         f"\033[31m\033[4m{filename}\033[0m exists\n")
+        print(f"\n\033[31m\033[1m[ERROR]\033[0m Please check if file \033[31m\033[4m{filename}\033[0m exists\n")
+        exit()
 
 
 def check_site(site: str):
