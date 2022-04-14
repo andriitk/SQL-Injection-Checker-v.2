@@ -28,8 +28,8 @@ def get_file_lines(filename: str):
             symbols = list(symbols)
             return symbols
     except FileNotFoundError:
-        raise SystemExit(f"\n\033[31m\033[1m[ERROR]\033[0m Please check if file "
-                         f"\033[31m\033[4m{filename}\033[0m exists\n")
+        print(f"\n\033[31m\033[1m[ERROR]\033[0m Please check if file \033[31m\033[4m{filename}\033[0m exists\n")
+        exit()
 
 
 def check_site(site: str):
@@ -70,10 +70,9 @@ def finish(site: str):
     tested_urls = check_site(site)
 
     if not tested_urls:
-        return \
-            print(
-                f"\033[31m\033[1m[ERROR]\033[0m \033[34m\033[4mURL\033[0m \033[31m\033[4m{site}\033[0m \033[33m\033[1mHASN'T "
-                f"\033[34m\033[1m<form>\033[0m \033[33m\033[1mTAG\033[0m")
+        print(
+            f"\033[31m\033[1m[ERROR]\033[0m \033[34m\033[4mURL\033[0m \033[31m\033[4m{site}\033[0m \033[33m\033[1mHASN'T "
+            f"\033[34m\033[1m<form>\033[0m \033[33m\033[1mTAG\033[0m")
     else:
         for tested_url in tested_urls:
             for symbol in symbols:
@@ -98,15 +97,10 @@ def finish(site: str):
                     print(
                         f"\033[31m\033[1m[{cur_time} - BAD]\033[0m \033[33m\033[1m NOT INJECTION \033[0m "
                         f"\033[34m\033[4m{url}\033[0m")
-    return
 
 
 def main():
-    try:
-        sites = get_file_lines('sites.txt')
-    except FileNotFoundError:
-        raise SystemExit(
-            f"\n\033[31m\033[1m[ERROR]\033[0m Please check if file \033[31m\033[4msites.txt\033[0m exists\n")
+    sites = get_file_lines('sites.txt')
 
     with ProcessPoolExecutor(max_workers=10) as ex:
         ex.map(finish, sites)
@@ -114,11 +108,11 @@ def main():
     if os.path.exists('inj_sites.txt'):
         counter = len(get_file_lines('inj_sites.txt'))
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-        return print(
+        print(
             f"\n\033[33m\033[1m[GOOD WORK]\033[0m \033[34m\033[4m{counter}\033[0m URLS \033[33m\033[1mMAYBE HAS SQL-VULNERABILITY\033[0m ❗❗❗")
     else:
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-        return print(
+        print(
             f"\n\033[33m\033[1m[BAD WORK]\033[0m \033[34m\033[4m0\033[0m MAYBE HAS SQL-VULNERABILITY")
 
 
