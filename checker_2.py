@@ -54,7 +54,7 @@ def check_site(site: str):
         return tested_urls
     except:
         return False
-        print(f"\n\033[31m\033[1m[ERROR]\033[0m Please check your url \033[31m\033[4m{site}\033[0m\n")
+        print(f"\n\033[31m\033[1m[ERROR]\033[0m Please check your urls \033[31m\033[4m{site}\033[0m\n")
 
 
 def error_in_body(response: Response) -> bool:
@@ -101,19 +101,23 @@ def finish(site: str):
 
 def main():
     sites = get_file_lines('sites.txt')
+    if len(sites) <= 20:
+        with ProcessPoolExecutor(max_workers=len(sites)) as ex:
+            ex.map(finish, sites)
 
-    with ProcessPoolExecutor(max_workers=10) as ex:
-        ex.map(finish, sites)
-
-    if os.path.exists('inj_sites.txt'):
-        counter = len(get_file_lines('inj_sites.txt'))
-        cur_time = datetime.datetime.now().strftime("%H:%M:%S")
-        print(
-            f"\n\033[33m\033[1m[GOOD WORK]\033[0m \033[34m\033[4m{counter}\033[0m URLS \033[33m\033[1mMAYBE HAS SQL-VULNERABILITY\033[0m ❗❗❗")
+        if os.path.exists('inj_sites.txt'):
+            counter = len(get_file_lines('inj_sites.txt'))
+            cur_time = datetime.datetime.now().strftime("%H:%M:%S")
+            print(
+                f"\n\033[33m\033[1m[GOOD WORK]\033[0m \033[34m\033[4m{counter}\033[0m URLS \033[33m\033[1mMAYBE HAS SQL-VULNERABILITY\033[0m ❗❗❗")
+        else:
+            cur_time = datetime.datetime.now().strftime("%H:%M:%S")
+            print(
+                f"\n\033[31m\033[1m[BAD WORK]\033[0m \033[34m\033[4m0 URLS\033[0m \033[33m\033[1mMAYBE HAS SQL-VULNERABILITY!\033[0m")
     else:
-        cur_time = datetime.datetime.now().strftime("%H:%M:%S")
         print(
-            f"\n\033[33m\033[1m[BAD WORK]\033[0m \033[34m\033[4m0\033[0m MAYBE HAS SQL-VULNERABILITY")
+            f"\n\033[31m\033[1m[ERROR]\033[0m  \033[33m\033[1mFile\033[0m \033[31m\033[4msites.txt\033[0m \033[33m\033[1mmust have 20 sites NOT MORE!\033[0m")
+        exit()
 
 
 if __name__ == "__main__":
